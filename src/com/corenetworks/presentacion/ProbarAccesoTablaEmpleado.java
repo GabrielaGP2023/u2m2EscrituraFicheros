@@ -64,7 +64,7 @@ public class ProbarAccesoTablaEmpleado {
         System.out.println("---Alta de Empleado ---");
         e1 = pedirDatosEmpleado();
         try {
-            System.out.println("Se ha insertado " + ate.insertar(e1) + " empleado");
+            System.out.println("Se ha insertado " + ate.insertarP(e1) + " empleado");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

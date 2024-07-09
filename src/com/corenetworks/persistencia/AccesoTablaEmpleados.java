@@ -3,6 +3,7 @@ package com.corenetworks.persistencia;
 import com.corenetworks.modelo.Empleado;
 import com.corenetworks.modelo.Producto;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,18 +33,44 @@ public class AccesoTablaEmpleados extends Conexion{
         return resultado;
     }
 
-    public int modificar(Empleado e) throws SQLException {
+    public int insertarP(Empleado e) throws SQLException {
         //1. Declarar variables
-        Statement comando;
+        PreparedStatement comando;
         int resultado;
-        String sql = "update employees set first_name='" + e.getNombre()+
-                "', last_name ='"+ e.getApellido() +"' where employee_id = " +
-               e.getId();
+        String sql = "insert into employees " +
+                "(employee_id, first_name, last_name) " +
+                "values ( ?,?,?);";
         //2. Abrir conexion
         abrirConexion();
         //3. Obtener el Statement de la conexion
-        comando = miConexion.createStatement();
-        resultado = comando.executeUpdate(sql);
+        comando = miConexion.prepareStatement(sql);
+        //Dar valor a los parámetros
+        comando.setInt(1,e.getId());
+        comando.setString(2,e.getNombre());
+        comando.setString(3,e.getApellido());
+        resultado = comando.executeUpdate();
+        comando.close();
+        cerrarConexion();
+        //4. devolver el resultado
+        return resultado;
+    }
+
+    public int modificar(Empleado e) throws SQLException {
+        //1. Declarar variables
+        PreparedStatement comando;
+        int resultado=0;
+        String sql = "update employees set first_name=? "+
+                ", last_name =? where employee_id = ?" ;
+
+        //2. Abrir conexion
+        abrirConexion();
+        //3. Obtener el Statement de la conexion
+        comando = miConexion.prepareStatement(sql);
+        //Asignar los valores a los parámetros
+        comando.setString(1,e.getNombre());
+        comando.setString(2,e.getApellido());
+        comando.setInt(3,e.getId());
+        resultado = comando.executeUpdate();
         comando.close();
         cerrarConexion();
         //4. devolver el resultado
