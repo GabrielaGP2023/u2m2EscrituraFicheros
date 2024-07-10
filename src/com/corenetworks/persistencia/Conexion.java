@@ -18,7 +18,7 @@ public class Conexion {
         //2. Obtener la conexion
         miConexion = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/northwind3",
                 "postgres","postgres");
-        System.out.println("La conexion se ha abierto con exito");
+//        System.out.println("La conexion se ha abierto con exito");
     }
 
     public void cerrarConexion() throws SQLException {

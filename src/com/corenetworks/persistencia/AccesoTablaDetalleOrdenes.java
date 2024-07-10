@@ -1,6 +1,8 @@
 package com.corenetworks.persistencia;
 
 import com.corenetworks.modelo.DetalleOrden;
+import com.corenetworks.modelo.Estadistica;
+import com.corenetworks.modelo.Orden;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,6 +38,73 @@ public class AccesoTablaDetalleOrdenes extends Conexion{
         }
         //6. cerrar
         rejilla.close();
+        comando.close();
+        cerrarConexion();
+        return resultado;
+    }
+
+    public Estadistica consultaPorProducto(int idProducto ) throws SQLException {
+        //0. Definición de variables
+        PreparedStatement comando;
+        ResultSet rejilla;
+        Estadistica resultado;
+        String sql = """
+                         select product_id, sum (unit_price * quantity) as suma,
+                         sum(quantity) as cantidad
+                          from order_details  where product_id = ? group by product_id;
+                          """;
+        //1. Abrir la conexion
+        abrirConexion();
+        //2. Obtener el comando de la conexion
+        comando = miConexion.prepareStatement(sql);
+        //3. Asignar valor a los parámetros del comando
+        comando.setInt(1,idProducto);
+        //4. Ejecutar la sentencia
+        rejilla = comando.executeQuery();
+        //5. Obtener el resultado
+        if(rejilla.next()){
+            //En caso de que si traiga resultados
+            double venta = rejilla.getDouble("suma");
+            int cantidad = rejilla.getInt("cantidad");
+            resultado = new Estadistica(idProducto,venta,cantidad);
+
+        }else{
+            resultado = new Estadistica();
+        }
+        //6. cerrar
+        rejilla.close();
+        comando.close();
+        cerrarConexion();
+        return resultado;
+    }
+
+    public int altaDetalleOrden(DetalleOrden do1) throws SQLException {
+        //0. Definición de variables
+        PreparedStatement comando;
+        ResultSet rejilla;
+        int resultado;
+
+
+        String sql = """
+                         insert into order_details 
+                         (order_id, product_id, unit_price, quantity, discount)
+                         values (?,?,?,?,?);
+                         """;
+        //1. Abrir la conexion
+        abrirConexion();
+        //2. Obtener el comando de la conexion
+        comando = miConexion.prepareStatement(sql);
+        //3. Asignar valor a los parámetros del comando
+        comando.setInt(1,do1.getOrderId());
+        comando.setInt(2, do1.getProductoId());
+        comando.setFloat(3, do1.getPrecio());
+        comando.setInt(4, do1.getCantidad());
+        comando.setFloat(5, do1.getDescuento());
+        //4. Ejecutar la sentencia
+        resultado = comando.executeUpdate();
+        //5. Obtener el resultado
+
+        //6. cerrar
         comando.close();
         cerrarConexion();
         return resultado;

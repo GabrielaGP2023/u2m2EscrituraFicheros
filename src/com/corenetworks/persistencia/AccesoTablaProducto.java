@@ -36,7 +36,7 @@ public class AccesoTablaProducto extends Conexion{
             p1 = new Producto(idProducto,nombreProducto,precio,cantidadExistencia);
         }else{
             //cuando no leyó una fila - significa que no hay datos en BBDD
-            p1 = new Producto();
+            p1 = null;
         }
         //5. obtener cada valor de las columnas
         //6. devolver el resultado
