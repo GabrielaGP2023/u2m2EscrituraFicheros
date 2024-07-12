@@ -1,7 +1,9 @@
 package com.corenetworks.persistencia;
 
+import com.corenetworks.modelo.Estadistica;
 import com.corenetworks.modelo.Producto;
 
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -131,6 +133,67 @@ public class AccesoTablaProducto extends Conexion{
         comando.close();
         cerrarConexion();
         //4. devolver el resultado
+        return resultado;
+    }
+
+    public List<Producto> consultarProductoTerminenN() throws SQLException {
+        CallableStatement comando;
+        ResultSet rejilla;
+        String sqlSentencia = "SELECT * FROM productos_terminen_n();";
+        List<Producto> resultado = new ArrayList<>();
+        //1. Abrir la conexion
+        abrirConexion();
+        //2. Creo el statement - se obtiene de la conexión
+        comando = miConexion.prepareCall(sqlSentencia);
+        //3. Ejecuto la sentecia
+        rejilla = comando.executeQuery();
+        //4. Verificar si hay resultado
+        while (rejilla.next()==true){
+            //Se pudo leer una fila
+            int idProducto;
+            String nombreProducto;
+            double precio;
+            double cantidadExistencia;
+            idProducto = rejilla.getInt("productid");
+            nombreProducto = rejilla.getString("productname");
+            precio = rejilla.getDouble("unitprice");
+            cantidadExistencia = rejilla.getDouble("unitsinstock");
+            Producto p1 = new Producto(idProducto,nombreProducto,precio,cantidadExistencia);
+            resultado.add(p1);
+        }
+        //5. obtener cada valor de las columnas
+        //6. devolver el resultado
+        rejilla.close();
+        comando.close();
+        cerrarConexion();
+        return resultado;
+    }
+
+    public Estadistica consultarResumenCategoria(int idCategoria) throws SQLException {
+        CallableStatement comando;
+        ResultSet rejilla;
+        String sqlSentencia = "SELECT * FROM estadistica_categoria(?);";
+        Estadistica resultado = null;
+        //1. Abrir la conexion
+        abrirConexion();
+        //2. Creo el statement - se obtiene de la conexión
+        comando = miConexion.prepareCall(sqlSentencia);
+        //2a. Asignar valor a los parámetros
+        comando.setInt(1,idCategoria);
+        //3. Ejecuto la sentecia
+        rejilla = comando.executeQuery();
+        //4. Verificar si hay resultado
+        if (rejilla.next()==true){
+            //Se pudo leer una fila
+            double precioPromedio = rejilla.getDouble("promedio");
+            int cantidadExistencia = rejilla.getInt("inventario");
+            resultado = new Estadistica(idCategoria,precioPromedio,cantidadExistencia);
+        }
+        //5. obtener cada valor de las columnas
+        //6. devolver el resultado
+        rejilla.close();
+        comando.close();
+        cerrarConexion();
         return resultado;
     }
 }
