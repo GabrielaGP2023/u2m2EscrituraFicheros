@@ -83,8 +83,11 @@ public class AccesoTablaDetalleOrdenes extends Conexion{
         PreparedStatement comando;
         ResultSet rejilla;
         int resultado;
-
-
+        AccesoTablaOrdenes ato1 = new AccesoTablaOrdenes();
+        if (ato1.ConsultaUna(do1.getOrderId())==null){
+            return 0;
+        }else
+        {
         String sql = """
                          insert into order_details 
                          (order_id, product_id, unit_price, quantity, discount)
@@ -100,6 +103,63 @@ public class AccesoTablaDetalleOrdenes extends Conexion{
         comando.setFloat(3, do1.getPrecio());
         comando.setInt(4, do1.getCantidad());
         comando.setFloat(5, do1.getDescuento());
+        //4. Ejecutar la sentencia
+        resultado = comando.executeUpdate();
+        //5. Obtener el resultado
+
+        //6. cerrar
+        comando.close();
+        cerrarConexion();
+        return resultado;}
+    }
+
+    public int modificarDetalleOrden(DetalleOrden do1) throws SQLException {
+        //0. Definición de variables
+        PreparedStatement comando;
+        int resultado;
+            String sql = """
+                         update order_details 
+                         set  unit_price = ?, quantity=? , discount=?
+                         where order_id = ?  and  product_id = ?                   
+                         """;
+            //1. Abrir la conexion
+            abrirConexion();
+            //2. Obtener el comando de la conexion
+            comando = miConexion.prepareStatement(sql);
+            //3. Asignar valor a los parámetros del comando
+            comando.setFloat(1, do1.getPrecio());
+            comando.setInt(2, do1.getCantidad());
+            comando.setFloat(3, do1.getDescuento());
+            comando.setInt(4,do1.getOrderId());
+            comando.setInt(5, do1.getProductoId());
+            //4. Ejecutar la sentencia
+            resultado = comando.executeUpdate();
+            //5. Obtener el resultado
+
+            //6. cerrar
+            comando.close();
+            cerrarConexion();
+            return resultado;
+    }
+
+    public int eliminarDetalleOrden(int ordenId, int productoId) throws SQLException {
+        //0. Definición de variables
+        PreparedStatement comando;
+        int resultado;
+        String sql = """
+                        delete from order_details 
+                        where order_id=? and 
+                        product_id=?               
+                         """;
+        //1. Abrir la conexion
+        abrirConexion();
+        //2. Obtener el comando de la conexion
+        comando = miConexion.prepareStatement(sql);
+        //3. Asignar valor a los parámetros del comando
+
+        comando.setInt(1, ordenId);
+        comando.setInt(2,productoId);
+
         //4. Ejecutar la sentencia
         resultado = comando.executeUpdate();
         //5. Obtener el resultado
